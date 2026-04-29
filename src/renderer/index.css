@@ -1,0 +1,197 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Global Styles ── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #0a0a0f;
+  color: #f0f0ff;
+  overflow: hidden;
+}
+
+/* Light theme styles */
+.light body {
+  background: #ffffff;
+  color: #1e293b;
+}
+
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a4a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a5a;
+}
+
+/* Light theme scrollbar */
+.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(99, 102, 241, 0.3);
+  color: #f0f0ff;
+}
+
+/* ── Utility Classes ── */
+@layer components {
+  .glass-card {
+    @apply bg-brand-card/80 backdrop-blur-xl border border-brand-border rounded-2xl;
+  }
+
+  .light .glass-card {
+    @apply bg-light-brand-card opacity-80 border border-light-brand-border;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:border-accent-primary/30 hover:shadow-lg hover:shadow-accent-primary/5;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-accent-primary text-white rounded-xl font-medium text-sm
+           transition-all duration-200 hover:bg-accent-primary/90 hover:shadow-lg hover:shadow-accent-primary/25
+           active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-brand-hover text-white/80 rounded-xl font-medium text-sm border border-brand-border
+           transition-all duration-200 hover:bg-brand-border hover:text-white
+           active:scale-[0.97];
+  }
+
+  .light .btn-secondary {
+    @apply bg-light-brand-hover text-light-brand-text-secondary opacity-80 border-light-brand-border hover:bg-light-brand-border hover:text-light-brand-text-primary;
+  }
+
+  .btn-ghost {
+    @apply px-3 py-1.5 text-white/60 rounded-lg text-sm
+           transition-all duration-200 hover:bg-brand-hover hover:text-white;
+  }
+
+  .light .btn-ghost {
+    @apply text-light-brand-text-secondary hover:bg-light-brand-hover hover:text-light-brand-text-primary;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-red-500/10 text-red-400 rounded-xl font-medium text-sm border border-red-500/20
+           transition-all duration-200 hover:bg-red-500/20
+           active:scale-[0.97];
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 bg-brand-bg border border-brand-border rounded-xl text-white text-sm
+           placeholder:text-white/30 outline-none
+           transition-all duration-200
+           focus:border-accent-primary/50 focus:ring-2 focus:ring-accent-primary/10;
+  }
+
+  .light .input-field {
+    @apply bg-light-brand-bg border-light-brand-border text-light-brand-text-primary placeholder:text-light-brand-text-tertiary;
+  }
+
+  .label-text {
+    @apply block text-xs font-medium text-white/50 uppercase tracking-wider mb-1.5;
+  }
+
+  .light .label-text {
+    @apply text-light-brand-text-secondary;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold text-white tracking-tight;
+  }
+
+  .light .section-title {
+    @apply text-light-brand-text-primary;
+  }
+
+  .section-subtitle {
+    @apply text-sm text-white/40 mt-1;
+  }
+
+  .light .section-subtitle {
+    @apply text-light-brand-text-tertiary;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-accent-primary/15 text-accent-primary;
+  }
+
+  .badge-secondary {
+    @apply badge bg-purple-500/15 text-purple-400;
+  }
+
+  .badge-accent {
+    @apply badge bg-amber-500/15 text-amber-400;
+  }
+
+  .badge-neutral {
+    @apply badge bg-white/10 text-white/60;
+  }
+
+  .divider {
+    @apply border-t border-brand-border/60 my-6;
+  }
+}
+
+/* ── Animations ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.05), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ── Color Picker Overrides ── */
+.react-colorful {
+  width: 100% !important;
+  height: 200px !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.react-colorful__saturation {
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.react-colorful__hue {
+  height: 14px !important;
+  border-radius: 0 0 12px 12px !important;
+}
+
+.react-colorful__pointer {
+  width: 20px !important;
+  height: 20px !important;
+  border-width: 3px !important;
+}

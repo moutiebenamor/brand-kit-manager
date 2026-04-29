@@ -1,0 +1,26 @@
+appId: com.brandkit.manager
+productName: Brand Kit Manager
+directories:
+  buildResources: assets
+  output: release
+files:
+  - dist/**/*
+  - src/main/**/*
+  - "!node_modules/**/*"
+  - node_modules/better-sqlite3/**/*
+win:
+  target:
+    - nsis
+  icon: assets/icon.ico
+mac:
+  target:
+    - dmg
+  icon: assets/icon.icns
+linux:
+  target:
+    - AppImage
+  icon: assets/icon.png
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true

@@ -1,0 +1,37 @@
+{
+  "name": "brand-kit-manager",
+  "version": "1.0.0",
+  "description": "Store and manage all your brand assets — colors, fonts, logos, voice guidelines",
+  "main": "src/main/index.js",
+  "scripts": {
+    "dev": "concurrently -k \"cross-env BROWSER=none vite\" \"wait-on tcp:5173 && cross-env NODE_ENV=development electron .\"",
+    "build": "vite build",
+    "package": "vite build && electron-builder",
+    "postinstall": "echo done"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0",
+    "zustand": "^4.5.0",
+    "sql.js": "^1.10.0",
+    "chroma-js": "^2.4.2",
+    "lucide-react": "^0.344.0",
+    "react-colorful": "^5.6.1",
+    "react-dropzone": "^14.2.3",
+    "sonner": "^1.4.0"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.0",
+
+    "vite": "^5.1.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.35",
+    "autoprefixer": "^10.4.17",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0",
+    "cross-env": "^7.0.3"
+  }
+}
