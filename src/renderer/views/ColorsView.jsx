@@ -6,6 +6,7 @@ import ColorSwatch from '../components/ColorSwatch';
 import ColorPicker from '../components/ColorPicker';
 import GeneratorPanel from '../components/GeneratorPanel';
 import PreviewSection from '../components/PreviewSection';
+import UIMockupPreview from '../components/UIMockupPreview';
 
 const categories = ['all', 'primary', 'secondary', 'accent', 'neutral'];
 
@@ -156,6 +157,18 @@ export default function ColorsView() {
               </div>
             ))}
           </div>
+
+          {/* UI Mockup Preview */}
+          {colors.length > 0 && (
+            <div className="mb-12 animate-fade-in">
+              <div className="flex items-center gap-3 mb-6">
+                <h2 className="text-xl font-bold text-white tracking-tight">UI Mockups</h2>
+                <div className="h-px flex-1 bg-white/5" />
+                <span className="text-xs text-white/30">Preview your colors in real interfaces</span>
+              </div>
+              <UIMockupPreview palette={colors.map(c => ({ hex: c.hex, weight: c.weight || 500 })).sort((a, b) => (a.weight || 500) - (b.weight || 500))} />
+            </div>
+          )}
 
           {/* Individual Colors Grid */}
           {(ungrouped.length > 0 || colors.length === 0) && (

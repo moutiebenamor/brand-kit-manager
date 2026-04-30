@@ -1,17 +1,30 @@
 import { useState, useEffect } from 'react';
-import { Image, Upload, Filter, Grid, List } from 'lucide-react';
+import { Image, Upload, Filter, Grid, List, Search, Folder, Tag, MoreVertical } from 'lucide-react';
 import useBrandStore from '../store/brandStore';
 import AssetCard from '../components/AssetCard';
 
 const typeFilters = ['all', 'image', 'logo', 'icon', 'document'];
+const defaultCollections = ['Logos', 'Icons', 'Images', 'Documents', 'Social Media'];
 
 export default function AssetsView() {
   const { assets, uploadAssets, deleteAsset, loadBrands } = useBrandStore();
   const [filter, setFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCollection, setSelectedCollection] = useState('all');
+  const [viewMode, setViewMode] = useState('grid');
+  const [showCollectionMenu, setShowCollectionMenu] = useState(false);
 
   useEffect(() => { loadBrands(); }, []);
 
-  const filtered = filter === 'all' ? assets : assets.filter(a => a.type === filter);
+  const filtered = assets.filter(asset => {
+    const matchesType = filter === 'all' || asset.type === filter;
+    const matchesSearch = searchQuery === '' || 
+      asset.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      asset.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCollection = selectedCollection === 'all' || asset.collection === selectedCollection;
+    return matchesType && matchesSearch && matchesCollection;
+  });
+
   const handleOpen = async (filePath) => { await window.api.asset.open(filePath); };
 
   return (
@@ -23,20 +36,76 @@ export default function AssetsView() {
           </h1>
           <p className="section-subtitle">Store logos, icons, and brand imagery</p>
         </div>
-        <button onClick={uploadAssets} className="btn-primary flex items-center gap-2">
-          <Upload size={16} /> Upload Files
-        </button>
+        <div className="flex gap-2">
+          <button onClick={uploadAssets} className="btn-primary flex items-center gap-2">
+            <Upload size={16} /> Upload Files
+          </button>
+        </div>
       </div>
 
-      <div className="flex items-center gap-2 mb-6">
-        <Filter size={14} className="text-white/30" />
-        {typeFilters.map(type => (
-          <button key={type} onClick={() => setFilter(type)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filter === type ? 'bg-accent-primary/15 text-accent-primary' : 'text-white/40 hover:text-white/60 hover:bg-brand-hover'}`}>
-            {type.charAt(0).toUpperCase() + type.slice(1)}
+      {/* Search and Filters */}
+      <div className="flex items-center gap-4 mb-6">
+        {/* Search Bar */}
+        <div className="flex-1 relative">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+          <input
+            type="text"
+            placeholder="Search assets by name or tags..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder:text-white/30 outline-none focus:border-accent-primary/50"
+          />
+        </div>
+
+        {/* View Mode Toggle */}
+        <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1 border border-white/10">
+          <button
+            onClick={() => setViewMode('grid')}
+            className={`p-1.5 rounded transition-all ${viewMode === 'grid' ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white/60'}`}
+          >
+            <Grid size={16} />
           </button>
-        ))}
-        <span className="text-xs text-white/20 ml-2">{filtered.length} file{filtered.length !== 1 ? 's' : ''}</span>
+          <button
+            onClick={() => setViewMode('list')}
+            className={`p-1.5 rounded transition-all ${viewMode === 'list' ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white/60'}`}
+          >
+            <List size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* Type and Collection Filters */}
+      <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-2">
+          <Filter size={14} className="text-white/30" />
+          {typeFilters.map(type => (
+            <button key={type} onClick={() => setFilter(type)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filter === type ? 'bg-accent-primary/15 text-accent-primary' : 'text-white/40 hover:text-white/60 hover:bg-brand-hover'}`}>
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Folder size={14} className="text-white/30" />
+          <button
+            onClick={() => setSelectedCollection('all')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedCollection === 'all' ? 'bg-accent-primary/15 text-accent-primary' : 'text-white/40 hover:text-white/60 hover:bg-brand-hover'}`}
+          >
+            All Collections
+          </button>
+          {defaultCollections.map(collection => (
+            <button
+              key={collection}
+              onClick={() => setSelectedCollection(collection)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedCollection === collection ? 'bg-accent-primary/15 text-accent-primary' : 'text-white/40 hover:text-white/60 hover:bg-brand-hover'}`}
+            >
+              {collection}
+            </button>
+          ))}
+        </div>
+
+        <span className="text-xs text-white/20 ml-auto">{filtered.length} file{filtered.length !== 1 ? 's' : ''}</span>
       </div>
 
       <div onClick={uploadAssets}
@@ -46,9 +115,15 @@ export default function AssetsView() {
         <p className="text-xs text-white/20 mt-1">PNG, JPG, SVG, PDF, AI, EPS</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className={viewMode === 'grid' ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4' : 'space-y-2'}>
         {filtered.map(asset => (
-          <AssetCard key={asset.id} asset={asset} onDelete={deleteAsset} onOpen={handleOpen} />
+          <AssetCard 
+            key={asset.id} 
+            asset={asset} 
+            onDelete={deleteAsset} 
+            onOpen={handleOpen}
+            viewMode={viewMode}
+          />
         ))}
       </div>
 

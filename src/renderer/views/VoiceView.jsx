@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mic, Plus, Trash2, Edit3, Check, X, MessageSquare, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Mic, Plus, Trash2, Edit3, Check, X, MessageSquare, ThumbsUp, ThumbsDown, Sparkles, Zap } from 'lucide-react';
 import useBrandStore from '../store/brandStore';
 
 const categoryConfig = {
@@ -9,11 +9,19 @@ const categoryConfig = {
   example: { label: 'Example', icon: Edit3, color: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
 };
 
+const voiceContexts = [
+  { id: 'marketing', label: 'Marketing Copy', icon: Sparkles, example: 'Discover the future of productivity with our innovative solution.' },
+  { id: 'ui', label: 'UI Microcopy', icon: Zap, example: 'Save your changes automatically.' },
+  { id: 'error', label: 'Error Messages', icon: Edit3, example: 'Something went wrong. Please try again.' },
+  { id: 'success', label: 'Success Messages', icon: ThumbsUp, example: 'Your changes have been saved successfully!' },
+];
+
 export default function VoiceView() {
   const { voiceGuidelines, addVoiceGuideline, updateVoiceGuideline, deleteVoiceGuideline, loadBrands } = useBrandStore();
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ title: '', content: '', category: 'tone' });
+  const [selectedContext, setSelectedContext] = useState('marketing');
 
   useEffect(() => { loadBrands(); }, []);
 
@@ -51,6 +59,59 @@ export default function VoiceView() {
         <button onClick={() => { setForm({ title: '', content: '', category: 'tone' }); setAdding(true); }}
           className="btn-primary flex items-center gap-2"><Plus size={16} /> Add Guideline</button>
       </div>
+
+      {/* Contextual Voice Preview */}
+      {voiceGuidelines.length > 0 && (
+        <div className="glass-card p-5 mb-6 animate-slide-up">
+          <h3 className="text-sm font-semibold text-white mb-4">Voice in Context</h3>
+          
+          {/* Context Selector */}
+          <div className="flex items-center gap-2 mb-4">
+            {voiceContexts.map(context => {
+              const Icon = context.icon;
+              return (
+                <button
+                  key={context.id}
+                  onClick={() => setSelectedContext(context.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    selectedContext === context.id
+                      ? 'bg-accent-primary/15 text-accent-primary'
+                      : 'text-white/40 hover:text-white/60 hover:bg-brand-hover'
+                  }`}
+                >
+                  <Icon size={12} />
+                  {context.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Preview Card */}
+          <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="text-[10px] text-white/40 uppercase font-semibold mb-2">
+              {voiceContexts.find(c => c.id === selectedContext)?.label}
+            </div>
+            <p className="text-sm text-white/70 leading-relaxed">
+              {voiceContexts.find(c => c.id === selectedContext)?.example}
+            </p>
+            <div className="mt-3 pt-3 border-t border-white/10">
+              <div className="text-[10px] text-white/30 mb-2">Applied Guidelines:</div>
+              <div className="flex flex-wrap gap-2">
+                {voiceGuidelines.slice(0, 3).map(g => (
+                  <span key={g.id} className="px-2 py-1 bg-white/5 rounded text-[10px] text-white/50">
+                    {g.title}
+                  </span>
+                ))}
+                {voiceGuidelines.length > 3 && (
+                  <span className="px-2 py-1 bg-white/5 rounded text-[10px] text-white/30">
+                    +{voiceGuidelines.length - 3} more
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Form */}
       {(adding || editingId) && (

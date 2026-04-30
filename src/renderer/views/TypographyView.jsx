@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Type, Plus, X, Check } from 'lucide-react';
 import useBrandStore from '../store/brandStore';
 import FontPreview from '../components/FontPreview';
+import TypeScalePreview from '../components/TypeScalePreview';
 
 const popularFonts = [
   { name: 'Inter', family: 'Inter', category: 'body' },
@@ -62,6 +63,13 @@ export default function TypographyView() {
           </button>
         </div>
       </div>
+
+      {/* Live Type Scale Preview */}
+      {fonts.length > 0 && (
+        <div className="glass-card p-5 mb-6 animate-slide-up">
+          <TypeScalePreview fonts={fonts} />
+        </div>
+      )}
 
       {/* Quick Add Popular Fonts */}
       {showQuickAdd && (

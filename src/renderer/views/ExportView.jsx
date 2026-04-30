@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Download, Copy, Check, FileCode, FileJson, Braces, FileText } from 'lucide-react';
+import { Download, Copy, Check, FileCode, FileJson, Braces, FileText, Eye, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import useBrandStore from '../store/brandStore';
 import useClipboard from '../hooks/useClipboard';
@@ -17,6 +17,8 @@ export default function ExportView() {
   const [activeFormat, setActiveFormat] = useState('css');
   const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
+  const [lastExport, setLastExport] = useState(null);
 
   useEffect(() => { loadBrands(); }, []);
 
@@ -38,6 +40,31 @@ export default function ExportView() {
 
   const handleCopy = () => {
     copy(output, `${activeFormat.toUpperCase()} export`);
+    setLastExport({ format: activeFormat, timestamp: new Date() });
+  };
+
+  const handleDownload = () => {
+    if (!output) return;
+    
+    const extensions = {
+      css: 'css',
+      scss: 'scss',
+      json: 'json',
+      figmaTokens: 'json'
+    };
+    
+    const blob = new Blob([output], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `brand-kit-${activeFormat}.${extensions[activeFormat]}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    setLastExport({ format: activeFormat, timestamp: new Date() });
+    toast.success('File downloaded successfully!');
   };
 
   return (
@@ -74,23 +101,43 @@ export default function ExportView() {
       {/* Output */}
       <div className="glass-card overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-brand-border">
-          <span className="text-xs font-medium text-white/40">
-            {formats.find(f => f.id === activeFormat)?.label}
-          </span>
-          <button onClick={handleCopy} className="btn-ghost flex items-center gap-1.5 text-xs">
-            <Copy size={12} /> Copy All
-          </button>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-medium text-white/40">
+              {formats.find(f => f.id === activeFormat)?.label}
+            </span>
+            {lastExport && (
+              <span className="text-[10px] text-white/30">
+                Last: {lastExport.format.toUpperCase()} at {lastExport.timestamp.toLocaleTimeString()}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowPreview(!showPreview)}
+              className={`btn-ghost flex items-center gap-1.5 text-xs ${showPreview ? 'text-accent-primary' : ''}`}
+            >
+              <Eye size={12} /> {showPreview ? 'Hide' : 'Show'}
+            </button>
+            <button onClick={handleCopy} className="btn-ghost flex items-center gap-1.5 text-xs">
+              <Copy size={12} /> Copy
+            </button>
+            <button onClick={handleDownload} className="btn-primary flex items-center gap-1.5 text-xs px-3">
+              <Download size={12} /> Download
+            </button>
+          </div>
         </div>
-        <div className="p-4 max-h-[500px] overflow-auto">
-          {loading ? (
-            <div className="flex items-center gap-2 text-white/30 text-sm py-8 justify-center">
-              <div className="w-4 h-4 border-2 border-white/20 border-t-accent-primary rounded-full animate-spin" />
-              Generating...
-            </div>
-          ) : (
-            <pre className="text-sm font-mono text-white/70 leading-relaxed whitespace-pre-wrap">{output}</pre>
-          )}
-        </div>
+        {showPreview && (
+          <div className="p-4 max-h-[500px] overflow-auto">
+            {loading ? (
+              <div className="flex items-center gap-2 text-white/30 text-sm py-8 justify-center">
+                <div className="w-4 h-4 border-2 border-white/20 border-t-accent-primary rounded-full animate-spin" />
+                Generating...
+              </div>
+            ) : (
+              <pre className="text-sm font-mono text-white/70 leading-relaxed whitespace-pre-wrap">{output}</pre>
+            )}
+          </div>
+        )}
       </div>
 
       {!activeBrandId && (
